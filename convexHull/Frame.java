@@ -31,7 +31,8 @@ public class Frame extends JFrame {
 			points[i] = new Point((Math.random()*800), (Math.random()*600));
 		}
 	}
-	
+
+	/*Main Method*/
 	public static void main (String args[]) {
 		Frame window = new Frame();
 		points = new Point[numPoints];
