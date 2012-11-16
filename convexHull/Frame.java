@@ -11,11 +11,11 @@ public class Frame extends JFrame {
 			setContentPane(pane);
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			setSize(800,600);
-			setVisible(true);//asdf
+			setVisible(true);
 	}
 	
 	class Panel extends JPanel {
-		@Override
+		@Override// print all components
 		public void paintComponent(Graphics g) {
 			g.setColor(Color.black);
 			g.fillRect(0,0,800,600);
