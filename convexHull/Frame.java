@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.math.*;
 
+/*Frame Class*/
 public class Frame extends JFrame {
 	public static Point points[];
 	public static final int numPoints = 10;
