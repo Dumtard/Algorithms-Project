@@ -1,0 +1,6 @@
+all:
+	javac Frame.java Point.java
+test:
+	java Frame
+clean:
+	rm -f *.class
