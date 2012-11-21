@@ -1,13 +1,12 @@
 import java.lang.Math;
-import java.util.Stack;
+import java.util.*;
 
 public class ConvexHull {
 	private int numberPoints;
-	private Point points[];
+	private Vector<Point> points;
 
-	public ConvexHull(Point points[]) {
-		numberPoints = points.length;	
-		this.points = points;
+	public ConvexHull() {
+    points = new Vector<Point>();
 	}
 
 	private void sortArray(float angles[], int low, int high) {
@@ -29,9 +28,9 @@ public class ConvexHull {
 				float temp = angles[i];
 				angles[i] = angles[j];
 				angles[j] = temp;
-				Point temp2 = points[i];
-				points[i] = points[j];
-				points[j] = temp2;
+				Point temp2 = points.get(i);
+				points.set(i, points.get(j));
+				points.set(j, temp2);
 				i++;
 				j--;
 			}
@@ -45,31 +44,39 @@ public class ConvexHull {
 		}
 	}
 	
-	private int ccw (Point p1, Point p2, Point p3) {
-		return (int)((p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x));
+	private double ccw (Point p1, Point p2, Point p3) {
+		return ((p2.getX() - p1.getX())*(p3.getY() - p1.getY()) - (p2.getY() - p1.getY())*(p3.getX()- p1.getX()));
 	}
 
-	public Stack<Point> calculateHull() {
-		Point lowesty = points[0];
+	public Vector<Point> calculateHull(Vector<Point> pts) {
+    points.setSize(pts.size());
+    numberPoints = pts.size();
+		Collections.copy(points, pts);
+
+    if (numberPoints < 3) {
+      return points;
+    }
+
+		Point lowesty = points.get(0);
 		int lowestlocation = 0;
 		
 		/*Finds smallest y value and swaps it to start of array*/
 		for (int i = 0; i < numberPoints; i++) {
-			if (points[i].y > lowesty.y) {
-				lowesty = points[i];
+			if (points.get(i).getY() > lowesty.getY()) {
+				lowesty = points.get(i);
 				lowestlocation = i;
 			}
 		}
-		Point temp = points[1];
-		points[1] = lowesty;
-		points[lowestlocation] = temp;
+		Point temp = points.get(1);
+		points.set(1, lowesty);
+		points.set(lowestlocation, temp);
 
-		float anglesToLowest[] = new float[10];
+		float anglesToLowest[] = new float[numberPoints];
 
 		/*Makes array of all angles to lowest point*/
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < numberPoints; i++) {
 			/*Gets angle starting at the right*/
-			float angle = (float) Math.toDegrees(Math.atan2(points[i].x - points[1].x, points[i].y - points[1].y));
+			float angle = (float) Math.toDegrees(Math.atan2(points.get(i).getX() - points.get(1).getX(), points.get(i).getY() - points.get(1).getY()));
 			angle -= 90;
 			if (angle < 0) {
 				angle += 360;
@@ -77,44 +84,67 @@ public class ConvexHull {
 			anglesToLowest[i] = angle;
 		}
 
+    /* Sort points by angles to lowest point */
+    sortArray(anglesToLowest, 0, numberPoints-1);
+    for (int i = 0; i < 2; i++) {
+      points.add(0, points.get(numberPoints-1));
+    }
 
-		/*Sorts the points array by angle to lowest point*/
-		sortArray(anglesToLowest, 0, 9);
-		float temp2;
-		temp = points[1];
-		points[1] = points[9];
-		points[9] = temp;
-		temp = points[0];
-		points[0] = points[8];
-		points[8] = temp;
-		temp2 = anglesToLowest[1];
-		anglesToLowest[1] = anglesToLowest[9];
-		anglesToLowest[9] = temp2;
-		temp2 = anglesToLowest[0];
-		anglesToLowest[0] = anglesToLowest[8];
-		anglesToLowest[8] = temp2;
-		sortArray(anglesToLowest, 2, 9);
+    for (int i = 0; i < numberPoints; i++) {
+      points.get(i).setInHull(false);
+    }
 
-		Stack<Point> stackPoints = new Stack<Point>();
-		Point top;
+    points.get(0).setInHull(true);
+    points.get(1).setInHull(true);
+    points.get(2).setInHull(true);
+    
+    int first = 0, second = 1, third = 2;
+    int inRow = 0;
+    for (third = 2; third <= numberPoints-1; third++) {
+      if (ccw(points.get(first), points.get(second), points.get(third)) <= 0) {
+        points.get(first).setInHull(true);
+        points.get(second).setInHull(true);
+        points.get(third).setInHull(true);
+        System.out.println(first + "," + second + "," + third + " neg");
 
-		stackPoints.push(points[0]);
-		stackPoints.push(points[1]);
+        first = second;
+        second = third;
+        inRow++;
+      } else { 
+        points.get(second).setInHull(false);
+        System.out.println(first + "," + second + "," + third + " pos");
 
-		for (int i = 2; i < 10; i++) {
-			top = stackPoints.pop();
-			while (ccw(stackPoints.peek(), top, points[i]) > 0) {	
-				top = stackPoints.pop();
-			}
+        first--;
+        while (!points.get(first).isInHull()) {
+          first--;
+        }
+        second--;
+        while (!points.get(second).isInHull()) {
+          second--;
+        }
+        third--;
+        inRow = 0;
+      }
+    }
+    
 
-			stackPoints.push(top);
-			stackPoints.push(points[i]);
-		}
-		return stackPoints;
+    while (ccw(points.get(first), points.get(second), points.get(0)) > 0) {
+      if (ccw(points.get(first), points.get(second), points.get(0)) > 0) {
+        points.get(second).setInHull(false);
+      } else {
+        points.get(second).setInHull(true);
+      }
+
+      first--;
+      while (!points.get(first).isInHull()) {
+        first--;
+      }
+      second--;
+      while (!points.get(second).isInHull()) {
+        second--;
+      }
+    }
+    
+    return points;
 	}
 }
-/*
-3 4 5
-
-3 5 6
-*/
