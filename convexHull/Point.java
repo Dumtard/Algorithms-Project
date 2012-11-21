@@ -23,6 +23,14 @@ public class Point {
     this.y = y;
   }
 
+  public void setInHull(boolean inHull) {
+    this.inHull = inHull;
+  }
+
+  public boolean isInHull() {
+    return inHull;
+  }
+
   public void draw(Graphics g) {
     g.fillOval((int)(x - 5), (int)(y - 5), 10, 10);
   }
