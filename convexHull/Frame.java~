@@ -46,7 +46,7 @@ public class Frame extends JFrame implements ActionListener, MouseListener {
     @Override //print all components
     public void paintComponent(Graphics g) {
       g.setColor(Color.black);
-      g.fillRect(0,0,800,700);
+      g.fillRect(0,0,800,600);
     
       if (!points.isEmpty()) {
         for (int i = 0; i < points.size(); i++) {

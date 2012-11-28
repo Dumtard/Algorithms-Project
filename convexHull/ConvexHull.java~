@@ -105,14 +105,14 @@ public class ConvexHull {
         points.get(first).setInHull(true);
         points.get(second).setInHull(true);
         points.get(third).setInHull(true);
-        //System.out.println(first + "," + second + "," + third + " neg");
+        System.out.println(first + "," + second + "," + third + " neg");
 
         first = second;
         second = third;
         inRow++;
       } else { 
         points.get(second).setInHull(false);
-        //System.out.println(first + "," + second + "," + third + " pos");
+        System.out.println(first + "," + second + "," + third + " pos");
 
         first--;
         while (!points.get(first).isInHull()) {
